@@ -1,89 +1,41 @@
 package main
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
-	"net/http"
 )
 
-type LocationArea struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-}
-
-type Response struct {
-	Count    int            `json:"count"`
-	Next     string         `json:"next"`
-	Previous string         `json:"previous"`
-	Results  []LocationArea `json:"results"`
-}
-
-func commandMap(c *Config) error {
-	URL := c.next
-	if URL == "" {
-		URL = "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
-	}
-
-	res, err := http.Get(URL)
+func commandMap(cfg *config) error {
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationURL)
 	if err != nil {
-		fmt.Println("Error fetching data", err)
-		return nil
+		return err
 	}
 
-	defer res.Body.Close()
+	cfg.nextLocationURL = locationResp.Next
+	cfg.previousLocationURL = locationResp.Previous
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading results", err)
-		return nil
-	}
-
-	var response Response
-	if err := json.Unmarshal(body, &response); err != nil {
-		fmt.Println("Error unmarshalling JSON", err)
-		return nil
-	}
-
-	c.next = response.Next
-	c.previous = response.Previous
-
-	for _, el := range response.Results {
-		fmt.Println(el.Name)
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
 	}
 
 	return nil
 }
 
-func commandMapb(c *Config) error {
-	URL := c.previous
-	if URL == "" {
-		fmt.Println("You're on the first page")
-		return nil
+func commandMapb(cfg *config) error {
+	if cfg.previousLocationURL == nil {
+		return errors.New("You're on the first page")
 	}
 
-	res, err := http.Get(URL)
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.previousLocationURL)
 	if err != nil {
-		fmt.Println("Error fetching data", err)
-		return nil
+		return err
 	}
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading results", err)
-	}
+	cfg.nextLocationURL = locationResp.Next
+	cfg.previousLocationURL = locationResp.Previous
 
-	var response Response
-	if err := json.Unmarshal(body, &response); err != nil {
-		fmt.Println("Error unmarshalling JSON", err)
-		return nil
-	}
-
-	c.next = response.Next
-	c.previous = response.Previous
-
-	for _, el := range response.Results {
-		fmt.Println(el.Name)
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
 	}
 
 	return nil
