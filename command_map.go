@@ -3,12 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-
-	"github.com/mauricekoreman/go-pokedex/internal/pokecache"
 )
 
-func commandMap(cfg *config, cache *pokecache.Cache, parameter string) error {
-	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationURL, cache)
+func commandMap(cfg *config, args ...string) error {
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationURL)
 	if err != nil {
 		return err
 	}
@@ -23,12 +21,12 @@ func commandMap(cfg *config, cache *pokecache.Cache, parameter string) error {
 	return nil
 }
 
-func commandMapb(cfg *config, cache *pokecache.Cache, parameter string) error {
+func commandMapb(cfg *config, args ...string) error {
 	if cfg.previousLocationURL == nil {
 		return errors.New("you're on the first page")
 	}
 
-	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.previousLocationURL, cache)
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.previousLocationURL)
 	if err != nil {
 		return err
 	}

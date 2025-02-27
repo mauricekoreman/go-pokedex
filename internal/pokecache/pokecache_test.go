@@ -39,42 +39,6 @@ func TestAddGet(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
-	interval := 5 * time.Second
-	cases := []struct {
-		key string
-		val []byte
-	}{
-		{
-
-			key: "https://example.com",
-			val: []byte("testdata"),
-		},
-		{
-			key: "https://example.com/2",
-			val: []byte("testdata2"),
-		},
-	}
-
-	for i, c := range cases {
-		t.Run(fmt.Sprintf("Test case %v", i), func(t *testing.T) {
-			cache := NewCache(interval)
-			cache.Add(c.key, c.val)
-			_, ok := cache.Get(c.key)
-			if !ok {
-				t.Errorf("Expected to find key %q", c.key)
-				return
-			}
-			cache.Delete(c.key)
-			_, ok = cache.Get(c.key)
-			if ok {
-				t.Errorf("Expected to NOT find key %q", c.key)
-				return
-			}
-		})
-	}
-}
-
 func TestReapLoop(t *testing.T) {
 	const baseTime = 5 * time.Millisecond
 	const waitTime = baseTime + 5*time.Millisecond
