@@ -9,26 +9,23 @@ import (
 	"github.com/mauricekoreman/go-pokedex/internal/pokecache"
 )
 
-func (c Client) ListLocations(pageURL *string, cache *pokecache.Cache) (LocationsResponse, error) {
-	url := baseURL + "/location-area?offset=0&limit=20"
-	if pageURL != nil {
-		url = *pageURL
-	}
+func (c Client) ListPokemon(locationAreaName string, cache *pokecache.Cache) (LocationResponse, error) {
+	url := baseURL + "/location-area/" + locationAreaName
 
 	var data []byte
 	cachedData, exists := cache.Get(url)
-
 	if !exists {
+
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			fmt.Println("Error creating request")
-			return LocationsResponse{}, err
+			return LocationResponse{}, err
 		}
 
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			fmt.Println("Error making request")
-			return LocationsResponse{}, err
+			return LocationResponse{}, err
 		}
 
 		defer resp.Body.Close()
@@ -36,22 +33,19 @@ func (c Client) ListLocations(pageURL *string, cache *pokecache.Cache) (Location
 		d, err := io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Println("Error reading response")
-			return LocationsResponse{}, err
+			return LocationResponse{}, err
 		}
 
-		cache.Add(url, d)
 		data = d
 	} else {
 		data = cachedData
 	}
-
-	locationsResp := LocationsResponse{}
-	err := json.Unmarshal(data, &locationsResp)
+	locationResp := LocationResponse{}
+	err := json.Unmarshal(data, &locationResp)
 	if err != nil {
 		fmt.Println("Error unmarshalling data")
-		return LocationsResponse{}, err
+		return LocationResponse{}, err
 	}
 
-	return locationsResp, nil
-
+	return locationResp, nil
 }

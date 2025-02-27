@@ -32,8 +32,13 @@ func startRepl(cfg *config) {
 
 		firstWord := inputWords[0]
 
+		var secondWord string
+		if len(inputWords) > 1 {
+			secondWord = inputWords[1]
+		}
+
 		if command, exists := getCommands()[firstWord]; exists {
-			err := command.callback(cfg, cache)
+			err := command.callback(cfg, cache, secondWord)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -54,7 +59,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, *pokecache.Cache) error
+	callback    func(*config, *pokecache.Cache, string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -78,6 +83,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Displays the names of 20 previous location areas in the Pokemon world.",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Displays the names of the Pokemon species that can be found in a specific location area.",
+			callback:    commandExplore,
 		},
 	}
 }

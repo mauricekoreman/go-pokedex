@@ -7,9 +7,7 @@ import (
 	"github.com/mauricekoreman/go-pokedex/internal/pokecache"
 )
 
-func commandMap(cfg *config, cache *pokecache.Cache) error {
-	// fmt.Println("Cache address commandMap: ", cache)
-
+func commandMap(cfg *config, cache *pokecache.Cache, parameter string) error {
 	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationURL, cache)
 	if err != nil {
 		return err
@@ -25,7 +23,7 @@ func commandMap(cfg *config, cache *pokecache.Cache) error {
 	return nil
 }
 
-func commandMapb(cfg *config, cache *pokecache.Cache) error {
+func commandMapb(cfg *config, cache *pokecache.Cache, parameter string) error {
 	if cfg.previousLocationURL == nil {
 		return errors.New("you're on the first page")
 	}
