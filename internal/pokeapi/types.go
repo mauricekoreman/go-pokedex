@@ -24,7 +24,9 @@ type PokemonResponse struct {
 	BaseExperience int            `json:"base_experience"`
 	Height         int            `json:"height"`
 	Name           string         `json:"name"`
+	Weight         int            `json:"weight"`
 	Stats          []PokemonStats `json:"stats"`
+	Types          []PokemonType  `json:"types"`
 }
 
 // weight, height, states, types, base_experience
@@ -33,4 +35,10 @@ type PokemonStats struct {
 	Stat     struct {
 		Name string `json:"name"`
 	} `json:"stat"`
+}
+
+type PokemonType struct {
+	Type struct {
+		Name string `json:"name"`
+	} `json:"type"`
 }
